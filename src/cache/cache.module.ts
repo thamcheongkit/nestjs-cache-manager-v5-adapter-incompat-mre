@@ -1,13 +1,16 @@
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import { redisStore } from 'cache-manager-ioredis-yet';
+import { create as createRedisStore } from 'cache-manager-ioredis';
+
+export type LegacyRedisStore = ReturnType<typeof createRedisStore>;
 
 @Module({
   imports: [
     CacheModule.registerAsync({
       isGlobal: true,
-      useFactory: async () => ({
-        store: await redisStore({
+      useFactory: () => ({
+        store: createRedisStore({
+          ttl: 60_000,
           clusterConfig: {
             nodes: [
               {
